@@ -5,6 +5,8 @@ library("ggplot2")
 library("readxl")
 library("Rcpp")
 library("tidyverse")
+library(ggplot2)
+
 
 #### Creación de script para limpieza de datos
 
@@ -31,7 +33,6 @@ conteo <- df_long %>%
 print(conteo)
 
 
-library(ggplot2)
 
 ggplot(conteo, aes(x = reorder(Electrodomestico, -Frecuencia), y = Frecuencia)) +
   geom_bar(stat = "identity") +
@@ -183,4 +184,106 @@ for (i in seq_along(resultados_marcas)) {
 # harina de trigo que conoce?(Seleccione las opciones que crea aplican a cada marca que conoce)
 
 
+df_long <- data %>%
+  pivot_longer(cols = p93:p101, names_to = "Pregunta", values_to = "atributos") %>%
+  filter(atributos != "")
 
+conteo <- df_long %>%
+  group_by(atributos) %>%
+  summarise(Frecuencia = n()) %>%
+  arrange(desc(Frecuencia))
+
+print(conteo)
+
+## De las marcas de Harina que conoce y ha probado, en una escala de 1 a 5, 
+## donde 1 es "Nada satisfecho" y 5 es "Muy satisfecho", 
+## ¿Qué tan satisfecho está con las siguientes marcas de harina de trigo que ha usado?
+
+df_long <- data %>%
+  pivot_longer(cols = p102:p110, names_to = "Pregunta", values_to = "atributos") %>%
+  filter(!is.na(atributos) & atributos != "")
+
+conteo <- df_long %>%
+  group_by(Pregunta, atributos) %>%
+  summarise(Frecuencia = n(), .groups = 'drop') %>%
+  arrange(Pregunta, desc(atributos))
+
+print(conteo)
+
+resultado_tabulado <- conteo %>%
+  pivot_wider(names_from = atributos, values_from = Frecuencia, values_fill = list(Frecuencia = 0))
+
+print(resultado_tabulado)
+
+
+## ¿Cuáles son los principales usos que le da a la harina de trigo? (Marque todas las que apliquen)
+
+
+df_long <- data %>%
+  pivot_longer(cols = p111:p117, names_to = "Pregunta", values_to = "Usos") %>%
+  filter(Usos != "")
+
+conteo <- df_long %>%
+  group_by(Usos) %>%
+  summarise(Frecuencia = n()) %>%
+  arrange(desc(Frecuencia))
+
+print(conteo)
+
+## ¿Con qué frecuencia sueles realizar tus preparaciones?
+
+
+df_long <- data %>%
+  pivot_longer(cols = p118:p124, names_to = "Pregunta", values_to = "frecuencia") %>%
+  filter(!is.na(frecuencia) & frecuencia != "")
+
+conteo <- df_long %>%
+  group_by(frecuencia) %>%
+  summarise(Frecuencia = n()) %>%
+  arrange(desc(Frecuencia))
+
+print(conteo)
+
+## ¿Para qué tipo de recetas la usa? (Marque todas las que apliquen)
+
+df_long <- data %>%
+  pivot_longer(cols = p136:p142, names_to = "Pregunta", values_to = "Preparaciones") %>%
+  filter(!is.na(Preparaciones) & Preparaciones != "")
+
+conteo <- df_long %>%
+  group_by(Preparaciones) %>%
+  summarise(Frecuencia = n()) %>%
+  arrange(desc(Frecuencia))
+
+print(conteo)
+
+## ¿Qué atributos son más importantes al elegir una marca de harina de trigo? (Seleccione los 3 más importantes)
+
+df_long <- data %>%
+  pivot_longer(cols = p144:p154, names_to = "Pregunta", values_to = "Atributos") %>%
+  filter(!is.na(Atributos) & Atributos != "")
+
+
+conteo <- df_long %>%
+  group_by(Atributos) %>%
+  summarise(Frecuencia = n()) %>%
+  arrange(desc(Frecuencia))
+
+print(conteo)
+
+
+## ¿Qué tanto influyen los siguientes atributos en su decisión de compra? 
+## (Escala de 1 a 5, donde 1 es para nada importante y 5 es muy importante)
+
+
+df_long <- data %>%
+  pivot_longer(cols = p156:p165, names_to = "Pregunta", values_to = "Atributos") %>%
+  filter(!is.na(Atributos) & Atributos != "")
+
+
+conteo <- df_long %>%
+  group_by(Atributos) %>%
+  summarise(Frecuencia = n()) %>%
+  arrange(desc(Frecuencia))
+
+print(conteo)
